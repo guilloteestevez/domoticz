@@ -3513,9 +3513,9 @@ namespace http
 									continue;
 								}
 
-								int64_t total_first = std::stoll(sd2[0]);
-								int64_t total_last = std::stoll(sValue);
-								int64_t total_real = total_last - total_first;
+								float total_first = std::stof(sd2[0]);
+								float total_last = std::stof(sValue);
+								float total_real = total_last - total_first;
 
 								double musage = 0;
 								switch (metertype)
@@ -3534,7 +3534,7 @@ namespace http
 									sprintf(szTmp, "%.3f m3", musage);
 									break;
 								case MTYPE_COUNTER:
-									sprintf(szTmp, "%.10g", double(total_real) / divider);
+									sprintf(szTmp, "%.2f", double(total_real) / divider);
 									if (!ValueUnits.empty())
 									{
 										strcat(szTmp, " ");
@@ -3577,7 +3577,7 @@ namespace http
 								root["result"][ii]["Counter"] = szTmp;
 								break;
 							case MTYPE_COUNTER:
-								sprintf(szTmp, "%.10g", meteroffset + (dvalue / divider));
+								sprintf(szTmp, "%.2f", meteroffset + (dvalue / divider));
 								if (!ValueUnits.empty())
 								{
 									strcat(szTmp, " ");

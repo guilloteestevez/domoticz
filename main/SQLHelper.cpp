@@ -275,16 +275,16 @@ constexpr auto sqlCreateUsers =
 constexpr auto sqlCreateMeter =
 "CREATE TABLE IF NOT EXISTS [Meter] ("
 "[DeviceRowID] BIGINT NOT NULL, "
-"[Value] BIGINT NOT NULL, "
-"[Usage] INTEGER DEFAULT 0, "
+"[Value] REAL NOT NULL, "
+"[Usage] REAL DEFAULT 0, "
 "[Price] FLOAT DEFAULT 0, "
 "[Date] DATETIME DEFAULT (datetime('now','localtime')));";
 
 constexpr auto sqlCreateMeter_Calendar =
 "CREATE TABLE IF NOT EXISTS [Meter_Calendar] ("
 "[DeviceRowID] BIGINT NOT NULL, "
-"[Value] BIGINT NOT NULL, "
-"[Counter] BIGINT DEFAULT 0, "
+"[Value] REAL NOT NULL, "
+"[Counter] REAL DEFAULT 0, "
 "[Price] FLOAT DEFAULT 0, "
 "[Date] DATETIME DEFAULT (datetime('now','localtime')));";
 
@@ -6994,7 +6994,7 @@ void CSQLHelper::UpdateMeter()
 			else if ((dType == pTypeGeneral) && (dSubType == sTypeCounterIncremental))
 			{
 				double fValue = atof(sValue.c_str());
-				sprintf(szTmp, "%.0f", fValue);
+				sprintf(szTmp, "%.2f", fValue);
 				sValue = szTmp;
 			}
 			else if ((dType == pTypeGeneral) && (dSubType == sTypeVoltage))
@@ -7024,15 +7024,15 @@ void CSQLHelper::UpdateMeter()
 				price = PriceE;
 			}
 
-			int64_t MeterValue = 0;
-			int64_t MeterUsage = 0;
+			float MeterValue = 0.0F;
+			float MeterUsage = 0.0F;
 
 			try
 			{
 				if (!sUsage.empty())
-					MeterUsage = std::stoll(sUsage);
+					MeterUsage = std::stof(sUsage);
 				if (!sValue.empty())
-					MeterValue = std::stoll(sValue);
+					MeterValue = std::stof(sValue);
 			}
 			catch (const std::exception&)
 			{
@@ -7043,7 +7043,7 @@ void CSQLHelper::UpdateMeter()
 			//insert record
 			safe_query(
 				"INSERT INTO Meter (DeviceRowID, Value, [Usage], Price) "
-				"VALUES ('%" PRIu64 "', '%" PRId64 "', '%" PRId64 "', '%.4f')",
+				"VALUES ('%" PRIu64 "', '%.2f', '%.2f', '%.4f')",
 				ID,
 				MeterValue,
 				MeterUsage,
