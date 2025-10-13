@@ -469,15 +469,16 @@ void CEventSystem::GetCurrentStates()
 				std::vector<std::vector<std::string> > result2;
 
 				result2 = m_sql.safe_query("SELECT sValue FROM DeviceStatus WHERE (ID=%" PRIu64 ")", sitem.ID);
-				uint64_t total_max = std::stoull(result2[0][0]);
+
+				float total_max = std::stof(result2[0][0]);
 
 				//get value of today
 				std::string szDate = TimeToString(nullptr, TF_Date);
-				result2 = m_sql.safe_query("SELECT MIN(Value) FROM Meter WHERE (DeviceRowID=%" PRIu64 " AND Date>='%q')", sitem.ID, szDate.c_str());
+				result2 = m_sql.safe_query("SELECT Value FROM Meter WHERE (DeviceRowID=%" PRIu64 " AND Date<'%q') ORDER BY Date DESC LIMIT 1", sitem.ID, szDate.c_str());
 				if (!result2.empty())
 				{
-					uint64_t total_min = std::stoull(result2[0][0]);
-					uint64_t total_real = total_max - total_min;
+					float total_min = std::stof(result2[0][0]);
+					float total_real = total_max - total_min;
 
 					sd[4] = std::to_string(total_real); //sitem.sValue = l_sValue.assign(sd[4]);
 				}
@@ -879,18 +880,18 @@ void CEventSystem::GetCurrentMeasurementStates()
 					std::vector<std::vector<std::string> > result2;
 
 					result2 = m_sql.safe_query("SELECT sValue FROM DeviceStatus WHERE (ID=%" PRIu64 ")", sitem.ID);
-					uint64_t total_max = std::stoull(result2[0][0]);
+					float total_max = std::stof(result2[0][0]);
 
 					//get value of today
 					std::string szDate = TimeToString(nullptr, TF_Date);
-					result2 = m_sql.safe_query("SELECT MIN(Value) FROM Meter WHERE (DeviceRowID=%" PRIu64 " AND Date>='%q')",
+					result2 = m_sql.safe_query("SELECT Value FROM Meter WHERE (DeviceRowID=%" PRIu64 " AND Date<'%q') ORDER BY Date DESC LIMIT 1",
 						sitem.ID, szDate.c_str());
 					if (!result2.empty())
 					{
-						uint64_t total_min = std::stoull(result2[0][0]);
-						uint64_t total_real = total_max - total_min;
+						float total_min = std::stof(result2[0][0]);
+						float total_real = total_max - total_min;
 
-						utilityval = float(total_real) / divider;
+						utilityval = total_real / divider;
 						isUtility = true;
 					}
 				}
@@ -1456,6 +1457,7 @@ void CEventSystem::ProcessDevice(
 
 	std::string osValue = sValue;
 
+/* 
 	if ((devType == pTypeGeneral) && (subType == sTypeCounterIncremental))
 	{
 		//special case for incremental counter, need to calculate the actual count value
@@ -1474,7 +1476,7 @@ void CEventSystem::ProcessDevice(
 			osValue = std::to_string(total_real); //sitem.sValue = l_sValue.assign(dev_options);
 		}
 	}
-
+*/
 	if (g_bUseEventTrigger && GetEventTrigger(ulDevID, REASON_DEVICE, true))
 	{
 		_tEventQueue item;
